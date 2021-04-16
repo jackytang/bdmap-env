@@ -10,13 +10,11 @@
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 clear
-printf
-"
+printf "
 #######################################################################
 #       OneinStack for CentOS/RedHat 7+ Debian 8+ and Ubuntu 16+      #
 #       For more information please visit https://oneinstack.com      #
-#######################################################################
-"
+#######################################################################"
 
 # Check if user is root
 [ $(id -u) != "0" ] && {
@@ -140,9 +138,26 @@ if [ ${ARG_NUM} == 0 ]; then
         if [[ ! ${docker_flag} =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
         else
-            [ "${docker_flag}" == 'y' -a -e "/usr/local/bin/docker" ] && {
+            [ "${docker_flag}" == 'y' -a -e "${docker_install_dir}/docker" ] && {
                 echo "${CWARNING}docker already installed! ${CEND}"
                 unset docker_flag
+            }
+
+            break
+        fi
+    done
+
+    # check docker compose
+    while :; do
+        echo
+        read -e -p "Do you want to install docker compose? [y/n]: " docker_compose_flag
+
+        if [[ ! ${docker_compose_flag} =~ ^[y,n]$ ]]; then
+            echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
+        else
+            [ "${docker_compose_flag}" == 'y' -a -e "${docker_compose_install_dir}/docker-compose" ] && {
+                echo "${CWARNING}docker compose already installed! ${CEND}"
+                unset docker_compose_flag
             }
 
             break
@@ -193,7 +208,7 @@ if [ ${ARG_NUM} == 0 ]; then
         echo
         echo "${CMSG}Please restart the server and see if the services start up fine.${CEND}"
         read -e -p "Do you want to restart OS ? [y/n]: " reboot_flag
-        
+
         if [[ ! "${reboot_flag}" =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
         else
