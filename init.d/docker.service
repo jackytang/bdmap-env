@@ -6,7 +6,7 @@ Wants=network-online.target
 
 [Service]
 Type=notify
-ExecStart=/usr/local/docker/bin/dockerd
+ExecStart=/usr/local/docker/dockerd
 ExecReload=/bin/kill -s HUP $MAINPID
 LimitNOFILE=infinity
 LimitNPROC=infinity

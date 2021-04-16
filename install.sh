@@ -10,7 +10,8 @@
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 clear
-printf "
+printf
+"
 #######################################################################
 #       OneinStack for CentOS/RedHat 7+ Debian 8+ and Ubuntu 16+      #
 #       For more information please visit https://oneinstack.com      #
@@ -57,6 +58,7 @@ ARG_NUM=$#
 TEMP=$(getopt -o hvV --long help,version,docker,docker_compose,ssh_port:,iptables,reboot -- "$@" 2>/dev/null)
 [ $? != 0 ] && echo "${CWARNING}ERROR: unknown argument! ${CEND}" && Show_Help && exit 1
 eval set -- "${TEMP}"
+
 while :; do
     [ -z "$1" ] && break
     case "$1" in
@@ -108,10 +110,12 @@ done
 # Use default SSH port 22. If you use another SSH port on your server
 if [ -e "/etc/ssh/sshd_config" ]; then
     [ -z "$(grep ^Port /etc/ssh/sshd_config)" ] && now_ssh_port=22 || now_ssh_port=$(grep ^Port /etc/ssh/sshd_config | awk '{print $2}' | head -1)
+
     while :; do
         echo
         [ ${ARG_NUM} == 0 ] && read -e -p "Please input SSH port(Default: ${now_ssh_port}): " ssh_port
         ssh_port=${ssh_port:-${now_ssh_port}}
+
         if [ ${ssh_port} -eq 22 -o ${ssh_port} -gt 1024 -a ${ssh_port} -lt 65535 ] >/dev/null 2>&1 >/dev/null 2>&1 >/dev/null 2>&1; then
             break
         else
@@ -132,13 +136,15 @@ if [ ${ARG_NUM} == 0 ]; then
     while :; do
         echo
         read -e -p "Do you want to install docker? [y/n]: " docker_flag
+
         if [[ ! ${docker_flag} =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
         else
-            [ "${docker_flag}" == 'y' -a -e "/usr/bin/docker" ] && {
+            [ "${docker_flag}" == 'y' -a -e "/usr/local/bin/docker" ] && {
                 echo "${CWARNING}docker already installed! ${CEND}"
                 unset docker_flag
             }
+
             break
         fi
     done
@@ -147,19 +153,16 @@ fi
 if [ ! -e ~/.oneinstack ]; then
     case "${OS}" in
     "CentOS")
-        . include/init_CentOS.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
+        . include/init_centos.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
         ;;
     "Debian")
-        . include/init_Debian.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
+        . include/init_debian.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
         ;;
     "Ubuntu")
-        . include/init_Ubuntu.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
+        . include/init_ubuntu.sh 2>&1 | tee -a ${oneinstack_dir}/install.log
         ;;
     esac
 fi
-
-# start Time
-startTime=$(date +%s)
 
 # docker
 if [ "${docker_flag}" == 'y' ]; then
@@ -169,23 +172,28 @@ fi
 
 # docker_compose
 if [ "${docker_compose_flag}" == 'y' ]; then
-    . include/docker.sh
+    . include/docker_compose.sh
     Install_Docker_Composer 2>&1 | tee -a ${oneinstack_dir}/install.log
 fi
 
 # get web_install_dir and db_install_dir
 . include/check_dir.sh
 
-endTime=$(date +%s)
-((installTime = ($endTime - $startTime) / 60))
 echo "####################Congratulations########################"
-echo "Total OneinStack Install Time: ${CQUESTION}${installTime}${CEND} minutes"
-[ "${docker_flag}" == 'y' ] && echo -e "\n$(printf "%-32s" "docker install dir:")${CMSG}/usr/bin${CEND}"
+[ "${docker_flag}" == 'y' ] && {
+    echo -e "\n$(printf "%-32s" "docker install dir:")${CMSG}${docker_install_dir}${CEND}"
+}
+
+[ "${docker_compose_flag}" == 'y' ] && {
+    echo -e "\n$(printf "%-32s" "docker compose install dir:")${CMSG}${docker_compose_install_dir}${CEND}"
+}
+
 if [ ${ARG_NUM} == 0 ]; then
     while :; do
         echo
         echo "${CMSG}Please restart the server and see if the services start up fine.${CEND}"
         read -e -p "Do you want to restart OS ? [y/n]: " reboot_flag
+        
         if [[ ! "${reboot_flag}" =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
         else
@@ -193,4 +201,5 @@ if [ ${ARG_NUM} == 0 ]; then
         fi
     done
 fi
+
 [ "${reboot_flag}" == 'y' ] && reboot

@@ -10,13 +10,15 @@
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 clear
-printf "
+printf
+"
 #######################################################################
 #       OneinStack for CentOS/RedHat 7+ Debian 8+ and Ubuntu 16+      #
 #                         Uninstall OneinStack                        #
 #       For more information please visit https://oneinstack.com      #
 #######################################################################
 "
+
 # Check if user is root
 [ $(id -u) != "0" ] && {
     echo "${CFAILURE}Error: You must be root to run this script${CEND}"
@@ -96,31 +98,32 @@ Uninstall_Status() {
 
 Print_Warn() {
     echo
-    echo "${CWARNING}You will uninstall OneinStack, Please backup your configure files and DB data! ${CEND}"
+    echo "${CWARNING}You will uninstall OneinStack, Please backup your configure files! ${CEND}"
 }
 
 Print_Docker() {
-    [ -e "${docker_install_dir}" ] && echo ${docker_install_dir}
-    [ -e "/etc/init.d/docker" ] && echo /etc/init.d/docker
-    [ -e "/lib/systemd/system/docker.service" ] && echo /lib/systemd/system/docker.service
+    [ -e "${docker_install_dir}" ] && echo "${CMSG}${docker_install_dir}${CEND}"
+    [ -e "/etc/init.d/docker" ] && echo "${CMSG}/etc/init.d/docker${CEND}"
+    [ -e "/lib/systemd/system/docker.service" ] && echo "${CMSG}/lib/systemd/system/docker.service${CEND}"
 }
 
 Uninstall_Docker() {
     [ -e "${docker_install_dir}" ] && {
         service docker stop >/dev/null 2>&1
-        rm -rf ${docker_install_dir} /etc/init.d/docker /usr/local/bin/docker-*
+        rm -rf ${docker_install_dir} /etc/init.d/docker
+        rm -rf /usr/local/bin/docker* /usr/local/bin/containerd* /usr/local/bin/ctr /usr/local/bin/runc
         echo "${CMSG}Docker uninstall completed! ${CEND}"
     }
 
     [ -e "/lib/systemd/system/docker.service" ] && {
         systemctl disable docker >/dev/null 2>&1
-        rm -f /lib/systemd/system/docker.service
+        rm -rf /lib/systemd/system/docker.service
     }
 }
 
 Print_Docker_Compose() {
-    [ -e "${docker_compose_install_dir}" ] && echo ${docker_compose_install_dir}
-    [ -e "/usr/bin/docker-compose" ] && echo /usr/bin/docker-compose
+    [ -e "${docker_compose_install_dir}" ] && echo "${CMSG}${docker_compose_install_dir}${CEND}"
+    [ -e "/usr/bin/docker-compose" ] && echo "${CMSG}/usr/bin/docker-compose${CEND}"
 }
 
 Uninstall_Docker_Compose() {
