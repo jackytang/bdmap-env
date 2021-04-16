@@ -45,6 +45,7 @@ Show_Help() {
 
   --docker                    Install Docker
   --docker_compose            Install Docker Compose
+  --docker_image              Install Docker Image
 
   --ssh_port [No.]            SSH port
   --iptables                  Enable iptables
@@ -53,7 +54,7 @@ Show_Help() {
 }
 
 ARG_NUM=$#
-TEMP=$(getopt -o hvV --long help,version,docker,docker_compose,ssh_port:,iptables,reboot -- "$@" 2>/dev/null)
+TEMP=$(getopt -o hvV --long help,version,docker,docker_compose,docker_image,ssh_port:,iptables,reboot -- "$@" 2>/dev/null)
 [ $? != 0 ] && echo "${CWARNING}ERROR: unknown argument! ${CEND}" && Show_Help && exit 1
 eval set -- "${TEMP}"
 
@@ -80,9 +81,13 @@ while :; do
         docker_compose_flag=y
         shift 1
         [ -e "/usr/local/bin/docker-compose" ] && {
-            echo "${CWARNING}docker-compose already installed! ${CEND}"
+            echo "${CWARNING}docker compose already installed! ${CEND}"
             unset docker_compose_flag
         }
+        ;;
+    --docker_image
+        docker_image_flag=y
+        shift 1
         ;;
     --ssh_port)
         ssh_port=$2
@@ -160,6 +165,45 @@ if [ ${ARG_NUM} == 0 ]; then
                 unset docker_compose_flag
             }
 
+            break
+        fi
+    done
+
+    # choice docker image
+    while :; do echo
+        read -e -p "Do you want to install docker image? [y/n]: " docker_image_flag
+        if [[ ! ${docker_image_flag} =~ ^[y,n]$ ]]; then
+            echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
+        else
+            if [ "${docker_image_flag}" == 'y' ]; then
+                [ ! -e "${docker_install_dir}/docker" ] && {
+                    echo "${CWARNING}Docker is not install! ${CEND}";
+                    unset docker_image_option;
+                    break;
+                }
+
+                while :; do echo
+                    echo 'Please select a docker image version:'
+                    echo -e "\t${CMSG} 1${CEND}. Install php-5.3"
+                    echo -e "\t${CMSG} 2${CEND}. Install php-5.4"
+                    echo -e "\t${CMSG} 3${CEND}. Install php-5.5"
+                    echo -e "\t${CMSG} 4${CEND}. Install php-5.6"
+                    echo -e "\t${CMSG} 5${CEND}. Install php-7.0"
+                    echo -e "\t${CMSG} 6${CEND}. Install php-7.1"
+                    echo -e "\t${CMSG} 7${CEND}. Install php-7.2"
+                    echo -e "\t${CMSG} 8${CEND}. Install php-7.3"
+                    echo -e "\t${CMSG} 9${CEND}. Install php-7.4"
+                    echo -e "\t${CMSG}10${CEND}. Install php-8.0"
+                    read -e -p "Please input a number:(Default 7 press Enter) " docker_image_option
+                    docker_image_option=${docker_image_option:-7}
+
+                    if [[ ! ${docker_image_option} =~ ^[1-9]$|^10$ ]]; then
+                        echo "${CWARNING}input error! Please only input number 1~10${CEND}"
+                    else
+                        break
+                    fi
+                done
+            fi
             break
         fi
     done
