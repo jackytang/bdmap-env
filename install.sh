@@ -35,7 +35,7 @@ pushd ${oneinstack_dir} >/dev/null
 
 Version() {
     echo -e "version: 2.4"
-    echo -e "updated date: 2021-04-01 \n"
+    echo -e "updated date: 2021-04-01 "
 }
 
 Show_Help() {
@@ -68,23 +68,24 @@ while :; do
     --docker)
         docker_flag=y
         shift 1
-        [ -e "/usr/local/bin/docker" ] && {
-            echo -e "${CWARNING}docker already installed! \n ${CEND}"
+        [ -e "${docker_install_dir}/docker" ] && {
+            echo -e "${CWARNING}docker already installed! ${CEND}"
             unset docker_flag
         }
         ;;
     --docker_compose)
         docker_compose_flag=y
         shift 1
-        [ -e "/usr/local/bin/docker-compose" ] && {
-            echo -e "${CWARNING}docker compose already installed! \n ${CEND}"
+        [ -e "${docker_compose_install_dir}/docker-compose" ] && {
+            echo -e "${CWARNING}docker compose already installed!${CEND}"
             unset docker_compose_flag
         }
         ;;
     --docker_image_option)
         docker_image_option=$2; shift 2
         [[ ! ${docker_image_option} =~ ^[0-5]$ ]] && {
-            echo -e "${CWARNING}docker_image_option input error! Please only input number 0~5${CEND}"; exit 1;
+            echo -e "${CWARNING}docker_image_option input error! Please only input number 0~5${CEND}"
+            exit 1
         }
         ;;
     --ssh_port)
@@ -103,7 +104,7 @@ while :; do
         shift
         ;;
     *)
-        echo -e "${CWARNING}ERROR: unknown argument! \n${CEND}" && Show_Help && exit 1
+        echo -e "${CWARNING}ERROR: unknown argument! ${CEND}" && Show_Help && exit 1
         ;;
     esac
 done
@@ -121,7 +122,6 @@ if [ -e "/etc/ssh/sshd_config" ]; then
 
         ssh_port=${ssh_port:-${now_ssh_port}}
         if [ ${ssh_port} -eq 22 -o ${ssh_port} -gt 1024 -a ${ssh_port} -lt 65535 ] >/dev/null 2>&1 >/dev/null 2>&1 >/dev/null 2>&1; then
-            echo
             break
         else
             echo -e "${CWARNING}input error! Input range: 22,1025~65534 \n${CEND}"
@@ -130,7 +130,7 @@ if [ -e "/etc/ssh/sshd_config" ]; then
     done
 
     if [ -z "$(grep ^Port /etc/ssh/sshd_config)" -a "${ssh_port}" != '22' ]; then
-        sed -i "s@^#Port.*@&\nPort ${ssh_port}@" /etc/ssh/sshd_config
+        sed -i "s@^#Port.*@&Port ${ssh_port}@" /etc/ssh/sshd_config
     elif [ -n "$(grep ^Port /etc/ssh/sshd_config)" ]; then
         sed -i "s@^Port.*@Port ${ssh_port}@" /etc/ssh/sshd_config
     fi
@@ -142,14 +142,13 @@ if [ ${ARG_NUM} == 0 ]; then
         read -e -p "Do you want to install docker? [y/n]: " docker_flag
 
         if [[ ! ${docker_flag} =~ ^[y,n]$ ]]; then
-            echo -e "${CWARNING}input error! Please only input 'y' or 'n' \n${CEND}"
+            echo -e "${CWARNING}input error! Please only input 'y' or 'n' ${CEND}"
         else
-            [ "${docker_flag}" == 'y' -a -e "${docker_install_dir}/docker" ] && {
+            [ -e "${docker_install_dir}/docker" ] && {
                 echo -e "${CWARNING}docker already installed! ${CEND}"
                 unset docker_flag
             }
 
-            echo
             break
         fi
     done
@@ -159,14 +158,13 @@ if [ ${ARG_NUM} == 0 ]; then
         read -e -p "Do you want to install docker compose? [y/n]: " docker_compose_flag
 
         if [[ ! ${docker_compose_flag} =~ ^[y,n]$ ]]; then
-            echo -e "${CWARNING}input error! Please only input 'y' or 'n' \n${CEND}"
+            echo -e "${CWARNING}input error! Please only input 'y' or 'n' ${CEND}"
         else
             [ "${docker_compose_flag}" == 'y' -a -e "${docker_compose_install_dir}/docker-compose" ] && {
                 echo -e "${CWARNING}docker compose already installed! ${CEND}"
                 unset docker_compose_flag
             }
 
-            echo
             break
         fi
     done
@@ -189,8 +187,9 @@ fi
 if [ ${ARG_NUM} == 0 ]; then
     while :; do
         read -e -p "Do you want to install docker image? [y/n]: " docker_image_flag
+
         if [[ ! ${docker_image_flag} =~ ^[y,n]$ ]]; then
-            echo -e "${CWARNING}input error! Please only input 'y' or 'n' \n${CEND}"
+            echo -e "${CWARNING}input error! Please only input 'y' or 'n' ${CEND}"
         else
             if [ "${docker_image_flag}" == 'y' ]; then
                 [ ! -e "${docker_install_dir}/docker" ] && {
@@ -211,9 +210,8 @@ if [ ${ARG_NUM} == 0 ]; then
                     echo -e "\t${CMSG} q${CEND}. Exit"
 
                     read -e -p "Please input the correct option: " docker_image_option
-                    echo -e ""
                     if [[ ! "${docker_image_option}" =~ ^[0-5,q]$ ]]; then
-                        echo -e "${CWARNING}input error! Please only input 0~5 and q \n${CEND}"
+                        echo -e "${CWARNING}input error! Please only input 0~5 and q${CEND}"
                     else
                         . include/docker_image.sh
 
@@ -252,7 +250,6 @@ if [ ${ARG_NUM} == 0 ]; then
                 done
             fi
 
-            echo
             break
         fi
     done
@@ -319,7 +316,7 @@ echo "############################Congratulations############################"
 
 if [ ${ARG_NUM} == 0 ]; then
     while :; do
-        echo -e "\n${CMSG}Please restart the server and see if the services start up fine.${CEND}"
+        echo -e "${CMSG}Please restart the server and see if the services start up fine.${CEND}"
         read -e -p "Do you want to restart OS ? [y/n]: " reboot_flag
 
         if [[ ! "${reboot_flag}" =~ ^[y,n]$ ]]; then
@@ -327,8 +324,6 @@ if [ ${ARG_NUM} == 0 ]; then
         else
             break
         fi
-
-        echo
     done
 fi
 
