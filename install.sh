@@ -82,7 +82,7 @@ Docker_Image() {
             Install_Java_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
             ;;
         q)
-            break
+            # break
             ;;
     esac
 }
@@ -106,7 +106,7 @@ while :; do
     --docker)
         docker_flag=y
         shift 1
-        [ -e "/usr/bin/docker" ] && {
+        [ -e "/usr/local/bin/docker" ] && {
             echo "${CWARNING}docker already installed! ${CEND}"
             unset docker_flag
         }
@@ -225,8 +225,6 @@ if [ ${ARG_NUM} == 0 ]; then
         if [[ ! ${docker_image_flag} =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
         else
-            # . include/docker_image.sh
-
             if [ "${docker_image_flag}" == 'y' ]; then
                 [ ! -e "${docker_install_dir}/docker" ] && {
                     echo "${CWARNING}Docker is not install! ${CEND}"
@@ -250,6 +248,7 @@ if [ ${ARG_NUM} == 0 ]; then
                         echo "${CWARNING}input error! Please only input 0~5 and q${CEND}"
                     else
                         Docker_Image
+                        break
                     fi
                 done
             fi

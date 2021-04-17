@@ -140,14 +140,15 @@ Uninstall_Docker_Compose() {
 
 Menu() {
     while :; do
+        echo
         echo 'What Are You Doing?'
         echo -e "\t${CMSG} 0${CEND}. Uninstall All"
         echo -e "\t${CMSG} 1${CEND}. Uninstall Docker"
         echo -e "\t${CMSG} 2${CEND}. Uninstall Docker Compose"
         echo -e "\t${CMSG} q${CEND}. Exit"
-        echo
 
         read -e -p "Please input the correct option: " Number
+        echo
         if [[ ! "${Number}" =~ ^[0-2,q]$ ]]; then
             echo "${CWARNING}input error! Please only input 0~2 and q${CEND}"
         else
