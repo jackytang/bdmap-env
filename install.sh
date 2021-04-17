@@ -33,19 +33,18 @@ pushd ${oneinstack_dir} >/dev/null
 . ./include/download.sh
 . ./include/get_char.sh
 
-version() {
-    echo "version: 2.4"
-    echo "updated date: 2021-04-01"
+Version() {
+    echo -e "version: 2.4"
+    echo -e "updated date: 2021-04-01 \n"
 }
 
 Show_Help() {
-    version
     echo -e "Usage: $0  command ...[parameters]...."
     echo -e "--help, -h                     Show this help message"
     echo -e "--version, -v                  Show version info"
     echo -e "--docker                       Install Docker"
     echo -e "--docker_compose               Install Docker Compose"
-    echo -e "--docker_image_option [1-6]    Install Docker Image"
+    echo -e "--docker_image_option [0-5]    Install Docker Image"
     echo -e "--ssh_port [No.]               SSH port"
     echo -e "--reboot                       Restart the server after installation"
 }
@@ -104,23 +103,28 @@ while :; do
         shift
         ;;
     *)
-        echo "${CWARNING}ERROR: unknown argument! ${CEND}" && Show_Help && exit 1
+        echo -e "${CWARNING}ERROR: unknown argument! \n${CEND}" && Show_Help && exit 1
         ;;
     esac
 done
 
 # Use default SSH port 22. If you use another SSH port on your server
 if [ -e "/etc/ssh/sshd_config" ]; then
-    [ -z "$(grep ^Port /etc/ssh/sshd_config)" ] && now_ssh_port=22 || now_ssh_port=$(grep ^Port /etc/ssh/sshd_config | awk '{print $2}' | head -1)
+    [ -z "$(grep ^Port /etc/ssh/sshd_config)" ] && {
+        now_ssh_port=22 || now_ssh_port=$(grep ^Port /etc/ssh/sshd_config | awk '{print $2}' | head -1)
+    }
 
     while :; do
-        [ ${ARG_NUM} == 0 ] && read -e -p "Please input SSH port(Default: ${now_ssh_port}): " ssh_port
-        ssh_port=${ssh_port:-${now_ssh_port}}
+        [ ${ARG_NUM} == 0 ] && {
+            read -e -p "Please input SSH port(Default: ${now_ssh_port}): " ssh_port
+        }
 
+        ssh_port=${ssh_port:-${now_ssh_port}}
         if [ ${ssh_port} -eq 22 -o ${ssh_port} -gt 1024 -a ${ssh_port} -lt 65535 ] >/dev/null 2>&1 >/dev/null 2>&1 >/dev/null 2>&1; then
+            echo
             break
         else
-            echo "${CWARNING}input error! Input range: 22,1025~65534${CEND}"
+            echo -e "${CWARNING}input error! Input range: 22,1025~65534 \n${CEND}"
             exit 1
         fi
     done
@@ -138,13 +142,14 @@ if [ ${ARG_NUM} == 0 ]; then
         read -e -p "Do you want to install docker? [y/n]: " docker_flag
 
         if [[ ! ${docker_flag} =~ ^[y,n]$ ]]; then
-            echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
+            echo -e "${CWARNING}input error! Please only input 'y' or 'n' \n${CEND}"
         else
             [ "${docker_flag}" == 'y' -a -e "${docker_install_dir}/docker" ] && {
-                echo -e "${CWARNING}docker already installed! \n ${CEND}"
+                echo -e "${CWARNING}docker already installed! ${CEND}"
                 unset docker_flag
             }
 
+            echo
             break
         fi
     done
@@ -154,13 +159,14 @@ if [ ${ARG_NUM} == 0 ]; then
         read -e -p "Do you want to install docker compose? [y/n]: " docker_compose_flag
 
         if [[ ! ${docker_compose_flag} =~ ^[y,n]$ ]]; then
-            echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
+            echo -e "${CWARNING}input error! Please only input 'y' or 'n' \n${CEND}"
         else
             [ "${docker_compose_flag}" == 'y' -a -e "${docker_compose_install_dir}/docker-compose" ] && {
-                echo -e "${CWARNING}docker compose already installed! \n ${CEND}"
+                echo -e "${CWARNING}docker compose already installed! ${CEND}"
                 unset docker_compose_flag
             }
 
+            echo
             break
         fi
     done
@@ -184,11 +190,11 @@ if [ ${ARG_NUM} == 0 ]; then
     while :; do
         read -e -p "Do you want to install docker image? [y/n]: " docker_image_flag
         if [[ ! ${docker_image_flag} =~ ^[y,n]$ ]]; then
-            echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
+            echo -e "${CWARNING}input error! Please only input 'y' or 'n' \n${CEND}"
         else
             if [ "${docker_image_flag}" == 'y' ]; then
                 [ ! -e "${docker_install_dir}/docker" ] && {
-                    echo "${CWARNING}Docker is not install! ${CEND}"
+                    echo  -e "${CWARNING}Docker is not install! ${CEND}"
                     unset docker_image_option
                     break
                 }
@@ -207,13 +213,12 @@ if [ ${ARG_NUM} == 0 ]; then
                     read -e -p "Please input the correct option: " docker_image_option
                     echo -e ""
                     if [[ ! "${docker_image_option}" =~ ^[0-5,q]$ ]]; then
-                        echo "${CWARNING}input error! Please only input 0~5 and q${CEND}"
+                        echo -e "${CWARNING}input error! Please only input 0~5 and q \n${CEND}"
                     else
                         . include/docker_image.sh
 
                         case "$docker_image_option" in
                             0)
-                                # echo -e "\t${CMSG} 1${CEND}. Install all"
                                 Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
                                 Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
                                 Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
@@ -247,6 +252,7 @@ if [ ${ARG_NUM} == 0 ]; then
                 done
             fi
 
+            echo
             break
         fi
     done
@@ -308,7 +314,7 @@ echo "############################Congratulations############################"
 }
 
 [[ "${docker_image_option}" =~ ^[0-5,q]$ ]] && {
-    echo -e "$(printf "%-32s" "docker image install dir:")${CMSG}nginx, mysql, redis, java, java-mysql${CEND}"
+    docker image ls
 }
 
 if [ ${ARG_NUM} == 0 ]; then
@@ -321,9 +327,9 @@ if [ ${ARG_NUM} == 0 ]; then
         else
             break
         fi
+
+        echo
     done
-else
-    echo -e ""
 fi
 
 [ "${reboot_flag}" == 'y' ] && reboot
