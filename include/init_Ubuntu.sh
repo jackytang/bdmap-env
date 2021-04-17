@@ -9,7 +9,7 @@
 #       https://github.com/oneinstack/oneinstack
 
 # Custom profile
-cat > /etc/profile.d/oneinstack.sh << EOF
+cat >/etc/profile.d/oneinstack.sh <<EOF
 HISTSIZE=10000
 HISTTIMEFORMAT="%F %T \$(whoami) "
 
@@ -28,16 +28,26 @@ EOF
 sed -i 's@^"syntax on@syntax on@' /etc/vim/vimrc
 
 # PS1
-[ -z "$(grep ^PS1 ~/.bashrc)" ] && echo "PS1='\${debian_chroot:+(\$debian_chroot)}\\[\\e[1;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ '" >> ~/.bashrc
+[ -z "$(grep ^PS1 ~/.bashrc)" ] && {
+    echo "PS1='\${debian_chroot:+(\$debian_chroot)}\\[\\e[1;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ '" >>~/.bashrc
+}
 
 # history
-[ -z "$(grep history-timestamp ~/.bashrc)" ] && echo "PROMPT_COMMAND='{ msg=\$(history 1 | { read x y; echo \$y; });user=\$(whoami); echo \$(date \"+%Y-%m-%d %H:%M:%S\"):\$user:\`pwd\`/:\$msg ---- \$(who am i); } >> /tmp/\`hostname\`.\`whoami\`.history-timestamp'" >> ~/.bashrc
+[ -z "$(grep history-timestamp ~/.bashrc)" ] && {
+    echo "PROMPT_COMMAND='{ msg=\$(history 1 | { read x y; echo \$y; });user=\$(whoami); echo \$(date \"+%Y-%m-%d %H:%M:%S\"):\$user:\`pwd\`/:\$msg ---- \$(who am i); } >> /tmp/\`hostname\`.\`whoami\`.history-timestamp'" >>~/.bashrc
+}
 
 # /etc/security/limits.conf
-[ -e /etc/security/limits.d/*nproc.conf ] && rename nproc.conf nproc.conf_bk /etc/security/limits.d/*nproc.conf
-[ -z "$(grep 'session required pam_limits.so' /etc/pam.d/common-session)" ] && echo "session required pam_limits.so" >> /etc/pam.d/common-session
+[ -e /etc/security/limits.d/*nproc.conf ] && {
+    rename nproc.conf nproc.conf_bk /etc/security/limits.d/*nproc.conf
+}
+
+[ -z "$(grep 'session required pam_limits.so' /etc/pam.d/common-session)" ] {
+    && echo "session required pam_limits.so" >>/etc/pam.d/common-session
+}
+
 sed -i '/^# End of file/,$d' /etc/security/limits.conf
-cat >> /etc/security/limits.conf <<EOF
+cat >>/etc/security/limits.conf <<EOF
 # End of file
 * soft nproc 1000000
 * hard nproc 1000000
@@ -50,7 +60,9 @@ root hard nofile 1000000
 EOF
 
 # /etc/hosts
-[ "$(hostname -i | awk '{print $1}')" != "127.0.0.1" ] && sed -i "s@127.0.0.1.*localhost@&\n127.0.0.1 $(hostname)@g" /etc/hosts
+[ "$(hostname -i | awk '{print $1}')" != "127.0.0.1" ] && {
+    sed -i "s@127.0.0.1.*localhost@&\n127.0.0.1 $(hostname)@g" /etc/hosts
+}
 
 # Set timezone
 rm -rf /etc/localtime
@@ -63,7 +75,7 @@ ln -s /usr/share/zoneinfo/${timezone} /etc/localtime
 #EOF
 
 # /etc/sysctl.conf
-[ -z "$(grep 'fs.file-max' /etc/sysctl.conf)" ] && cat >> /etc/sysctl.conf << EOF
+[ -z "$(grep 'fs.file-max' /etc/sysctl.conf)" ] && cat >>/etc/sysctl.conf <<EOF
 fs.file-max = 1000000
 fs.inotify.max_user_instances = 8192
 net.ipv4.tcp_syncookies = 1
@@ -84,57 +96,22 @@ sysctl -p
 
 sed -i 's@^ACTIVE_CONSOLES.*@ACTIVE_CONSOLES="/dev/tty[1-2]"@' /etc/default/console-setup
 locale-gen en_US.UTF-8
-[ -d "/var/lib/locales/supported.d" ] && echo "en_US.UTF-8 UTF-8" > /var/lib/locales/supported.d/local
-cat > /etc/default/locale << EOF
+
+[ -d "/var/lib/locales/supported.d" ] && echo "en_US.UTF-8 UTF-8" >/var/lib/locales/supported.d/local
+cat >/etc/default/locale <<EOF
 LANG=en_US.UTF-8
 LANGUAGE=en_US:en
 EOF
 
 # Update time
 if [ -e "$(which ntpdate)" ]; then
-  ntpdate -u pool.ntp.org
-  [ ! -e "/var/spool/cron/crontabs/root" -o -z "$(grep ntpdate /var/spool/cron/crontabs/root 2>/dev/null)" ] && { echo "*/20 * * * * $(which ntpdate) -u pool.ntp.org > /dev/null 2>&1" >> /var/spool/cron/crontabs/root;chmod 600 /var/spool/cron/crontabs/root; }
+    ntpdate -u pool.ntp.org
+    [ ! -e "/var/spool/cron/crontabs/root" -o -z "$(grep ntpdate /var/spool/cron/crontabs/root 2>/dev/null)" ] && {
+        echo "*/20 * * * * $(which ntpdate) -u pool.ntp.org > /dev/null 2>&1" >>/var/spool/cron/crontabs/root
+        chmod 600 /var/spool/cron/crontabs/root
+    }
 fi
 
-# iptables
-if [ "${iptables_flag}" == 'y' ]; then
-  apt-get -y install debconf-utils
-  echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-  echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-  apt-get -y install iptables-persistent
-  if [ -e "/etc/iptables/rules.v4" ] && [ -n "$(grep '^:INPUT DROP' /etc/iptables/rules.v4)" -a -n "$(grep 'NEW -m tcp --dport 22 -j ACCEPT' /etc/iptables/rules.v4)" -a -n "$(grep 'NEW -m tcp --dport 80 -j ACCEPT' /etc/iptables/rules.v4)" ]; then
-    IPTABLES_STATUS=yes
-  else
-    IPTABLES_STATUS=no
-  fi
-
-  if [ "${IPTABLES_STATUS}" == "no" ]; then
-    cat > /etc/iptables/rules.v4 << EOF
-# Firewall configuration written by system-config-securitylevel
-# Manual customization of this file is not recommended.
-*filter
-:INPUT DROP [0:0]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
-:syn-flood - [0:0]
--A INPUT -i lo -j ACCEPT
--A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
--A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
--A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
--A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
--A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
-COMMIT
-EOF
-  fi
-
-  FW_PORT_FLAG=$(grep -ow "dport ${ssh_port}" /etc/iptables/rules.v4)
-  [ -z "${FW_PORT_FLAG}" -a "${ssh_port}" != "22" ] && sed -i "s@dport 22 -j ACCEPT@&\n-A INPUT -p tcp -m state --state NEW -m tcp --dport ${ssh_port} -j ACCEPT@" /etc/iptables/rules.v4
-  iptables-restore < /etc/iptables/rules.v4
-  /bin/cp /etc/iptables/rules.v{4,6}
-  sed -i 's@icmp@icmpv6@g' /etc/iptables/rules.v6
-  ip6tables-restore < /etc/iptables/rules.v6
-  ip6tables-save > /etc/iptables/rules.v6 
-fi
 service rsyslog restart
 service ssh restart
 

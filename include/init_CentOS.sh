@@ -28,14 +28,19 @@ alias egrep='egrep --color'
 alias fgrep='fgrep --color'
 EOF
 
-[[ "$(lsb_release -is)" =~ ^EulerOS$ ]] && sed -i '/HISTTIMEFORMAT=/d' /etc/profile.d/oneinstack.sh
+[[ "$(lsb_release -is)" =~ ^EulerOS$ ]] && {
+    sed -i '/HISTTIMEFORMAT=/d' /etc/profile.d/oneinstack.sh
+}
 
 [[ ! "$(lsb_release -is)" =~ ^EulerOS$ ]] && [ -z "$(grep ^'PROMPT_COMMAND=' /etc/bashrc)" ] && cat >>/etc/bashrc <<EOF
 PROMPT_COMMAND='{ msg=\$(history 1 | { read x y; echo \$y; });logger "[euid=\$(whoami)]":\$(who am i):[\`pwd\`]"\$msg"; }'
 EOF
 
 # /etc/security/limits.conf
-[ -e /etc/security/limits.d/*nproc.conf ] && rename nproc.conf nproc.conf_bk /etc/security/limits.d/*nproc.conf
+[ -e /etc/security/limits.d/*nproc.conf ] && {
+    rename nproc.conf nproc.conf_bk /etc/security/limits.d/*nproc.conf
+}
+
 sed -i '/^# End of file/,$d' /etc/security/limits.conf
 cat >>/etc/security/limits.conf <<EOF
 # End of file
@@ -46,7 +51,9 @@ cat >>/etc/security/limits.conf <<EOF
 EOF
 
 # /etc/hosts
-[ "$(hostname -i | awk '{print $1}')" != "127.0.0.1" ] && sed -i "s@127.0.0.1.*localhost@&\n127.0.0.1 $(hostname)@g" /etc/hosts
+[ "$(hostname -i | awk '{print $1}')" != "127.0.0.1" ] && {
+    sed -i "s@127.0.0.1.*localhost@&\n127.0.0.1 $(hostname)@g" /etc/hosts
+}
 
 # Set timezone
 rm -rf /etc/localtime

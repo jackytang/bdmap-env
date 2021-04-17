@@ -10,14 +10,11 @@
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 clear
-printf
-"
-#######################################################################
-#       OneinStack for CentOS/RedHat 7+ Debian 8+ and Ubuntu 16+      #
-#                         Uninstall OneinStack                        #
-#       For more information please visit https://oneinstack.com      #
-#######################################################################
-"
+echo -e "#######################################################################"
+echo -e "#       OneinStack for CentOS/RedHat 7+ Debian 8+ and Ubuntu 16+      #"
+echo -e "#                         Uninstall OneinStack                        #"
+echo -e "#       For more information please visit https://oneinstack.com      #"
+echo -e "#######################################################################"
 
 # Check if user is root
 [ $(id -u) != "0" ] && {
@@ -32,15 +29,19 @@ pushd ${oneinstack_dir} >/dev/null
 . ./include/get_char.sh
 . ./include/check_dir.sh
 
+version() {
+    echo "version: 2.4"
+    echo "updated date: 2021-04-01"
+}
+
 Show_Help() {
     echo
-    echo "Usage: $0  command ...[parameters]....
-  --help, -h                    Show this help message, More: https://oneinstack.com
-  --quiet, -q                   quiet operation
-  --all                         Uninstall All
-  --docker                      Uninstall Docker
-  --docker_compose              Uninstall Docker Compose
-  "
+    echo "Usage: $0  command ...[parameters]...."
+    echo "--version, -v                 Show version info"
+    echo "--quiet, -q                   quiet operation"
+    echo "--all                         Uninstall All"
+    echo "--docker                      Uninstall Docker"
+    echo "--docker_compose              Uninstall Docker Compose"
 }
 
 ARG_NUM=$#
@@ -54,7 +55,11 @@ while :; do
         Show_Help
         exit 0
         ;;
-    -q | --quiet)
+    -v | -V | --version)
+        version
+        exit 0
+        ;;
+    -q|--quiet)
         quiet_flag=y
         uninstall_flag=y
         shift 1
@@ -135,17 +140,16 @@ Uninstall_Docker_Compose() {
 
 Menu() {
     while :; do
-        printf "
-What Are You Doing?
-\t${CMSG} 0${CEND}. Uninstall All
-\t${CMSG} 1${CEND}. Uninstall Docker
-\t${CMSG} 2${CEND}. Uninstall Docker Compose
-\t${CMSG} q${CEND}. Exit
-"
+        echo 'What Are You Doing?'
+        echo -e "\t${CMSG} 0${CEND}. Uninstall All"
+        echo -e "\t${CMSG} 1${CEND}. Uninstall Docker"
+        echo -e "\t${CMSG} 2${CEND}. Uninstall Docker Compose"
+        echo -e "\t${CMSG} q${CEND}. Exit"
         echo
+
         read -e -p "Please input the correct option: " Number
-        if [[ ! "${Number}" =~ ^[0-9,q]$ ]]; then
-            echo "${CWARNING}input error! Please only input 0~9 and q${CEND}"
+        if [[ ! "${Number}" =~ ^[0-2,q]$ ]]; then
+            echo "${CWARNING}input error! Please only input 0~2 and q${CEND}"
         else
             case "$Number" in
             0)

@@ -27,3 +27,8 @@ Install_Docker() {
         fi
     popd > /dev/null
 }
+
+Create_Network() {
+    docker network rm database
+    docker network create database
+}
