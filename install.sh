@@ -78,13 +78,15 @@ while :; do
         docker_compose_flag=y
         shift 1
         [ -e "/usr/local/bin/docker-compose" ] && {
-            echo -e "${CWARNING}docker compose already installed! \e ${CEND}"
+            echo -e "${CWARNING}docker compose already installed! \n ${CEND}"
             unset docker_compose_flag
         }
         ;;
     --docker_image_option)
         docker_image_option=$2; shift 2
-        [[ ! ${docker_image_option} =~ ^[0-5]$ ]] && { echo "${CWARNING}docker_image_option input error! Please only input number 0~5${CEND}"; exit 1; }
+        [[ ! ${docker_image_option} =~ ^[0-5]$ ]] && {
+            echo -e "${CWARNING}docker_image_option input error! Please only input number 0~5${CEND}"; exit 1;
+        }
         ;;
     --ssh_port)
         ssh_port=$2
@@ -133,14 +135,13 @@ fi
 if [ ${ARG_NUM} == 0 ]; then
     # check docker
     while :; do
-        echo
         read -e -p "Do you want to install docker? [y/n]: " docker_flag
 
         if [[ ! ${docker_flag} =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
         else
             [ "${docker_flag}" == 'y' -a -e "${docker_install_dir}/docker" ] && {
-                echo "${CWARNING}docker already installed! ${CEND}"
+                echo -e "${CWARNING}docker already installed! \n ${CEND}"
                 unset docker_flag
             }
 
@@ -150,14 +151,13 @@ if [ ${ARG_NUM} == 0 ]; then
 
     # check docker compose
     while :; do
-        echo
         read -e -p "Do you want to install docker compose? [y/n]: " docker_compose_flag
 
         if [[ ! ${docker_compose_flag} =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
         else
             [ "${docker_compose_flag}" == 'y' -a -e "${docker_compose_install_dir}/docker-compose" ] && {
-                echo "${CWARNING}docker compose already installed! ${CEND}"
+                echo -e "${CWARNING}docker compose already installed! \n ${CEND}"
                 unset docker_compose_flag
             }
 
@@ -182,7 +182,6 @@ fi
 # choice docker image
 if [ ${ARG_NUM} == 0 ]; then
     while :; do
-        echo
         read -e -p "Do you want to install docker image? [y/n]: " docker_image_flag
         if [[ ! ${docker_image_flag} =~ ^[y,n]$ ]]; then
             echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
@@ -259,7 +258,6 @@ if [ ${ARG_NUM} > 1 ]; then
 
     case "$docker_image_option" in
         0)
-            # echo -e "\t${CMSG} 1${CEND}. Install all"
             Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
             Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
             Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
