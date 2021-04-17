@@ -50,43 +50,6 @@ Show_Help() {
     echo -e "--reboot                       Restart the server after installation"
 }
 
-Docker_Image() {
-    . include/docker_image.sh
-
-    case "$docker_image_option" in
-        0)
-            # echo -e "\t${CMSG} 1${CEND}. Install all"
-            Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            Install_Java_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            Install_Java_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            ;;
-        1)
-            # echo -e "\t${CMSG} 2${CEND}. Install nginx"
-            Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            ;;
-        2)
-            # echo -e "\t${CMSG} 3${CEND}. Install mysql"
-            Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            ;;
-        3)
-            # echo -e "\t${CMSG} 4${CEND}. Install redis"
-            Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            ;;
-        4)
-            # echo -e "\t${CMSG} 5${CEND}. Install java sdk"
-            Install_Java_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            ;;
-        5)
-            Install_Java_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
-            ;;
-        q)
-            # break
-            ;;
-    esac
-}
-
 ARG_NUM=$#
 TEMP=$(getopt -o hvV --long help,version,docker,docker_compose,docker_image_option:,ssh_port:,reboot -- "$@" 2>/dev/null)
 [ $? != 0 ] && echo "${CWARNING}ERROR: unknown argument! ${CEND}" && Show_Help && exit 1
@@ -247,8 +210,40 @@ if [ ${ARG_NUM} == 0 ]; then
                     if [[ ! "${docker_image_option}" =~ ^[0-5,q]$ ]]; then
                         echo "${CWARNING}input error! Please only input 0~5 and q${CEND}"
                     else
-                        Docker_Image
-                        break
+                        . include/docker_image.sh
+
+                        case "$docker_image_option" in
+                            0)
+                                # echo -e "\t${CMSG} 1${CEND}. Install all"
+                                Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                Install_Java_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                Install_Java_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                ;;
+                            1)
+                                # echo -e "\t${CMSG} 2${CEND}. Install nginx"
+                                Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                ;;
+                            2)
+                                # echo -e "\t${CMSG} 3${CEND}. Install mysql"
+                                Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                ;;
+                            3)
+                                # echo -e "\t${CMSG} 4${CEND}. Install redis"
+                                Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                ;;
+                            4)
+                                # echo -e "\t${CMSG} 5${CEND}. Install java sdk"
+                                Install_Java_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                ;;
+                            5)
+                                Install_Java_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+                                ;;
+                            q)
+                                break
+                                ;;
+                        esac
                     fi
                 done
             fi
@@ -259,8 +254,36 @@ if [ ${ARG_NUM} == 0 ]; then
 fi
 
 # choice docker image
-if [ ${ARG_NUM} == 2 ]; then
-    Docker_Image
+if [ ${ARG_NUM} > 1 ]; then
+    . include/docker_image.sh
+
+    case "$docker_image_option" in
+        0)
+            # echo -e "\t${CMSG} 1${CEND}. Install all"
+            Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            Install_Java_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            Install_Java_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            ;;
+        1)
+            Install_Nginx_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            ;;
+        2)
+            Install_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            ;;
+        3)
+            Install_Redis_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            ;;
+        4)
+            Install_Java_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            ;;
+        5)
+            Install_Java_Mysql_Image 2>&1 | tee -a ${oneinstack_dir}/install.log
+            ;;
+        q)
+            ;;
+    esac
 fi
 
 if [ ! -e ~/.oneinstack ]; then
