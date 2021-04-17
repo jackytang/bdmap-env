@@ -90,7 +90,6 @@ done
 Uninstall_Status() {
     if [ "${quiet_flag}" != 'y' ]; then
         while :; do
-            echo
             read -e -p "Do you want to uninstall? [y/n]: " uninstall_flag
             if [[ ! ${uninstall_flag} =~ ^[y,n]$ ]]; then
                 echo "${CWARNING}input error! Please only input 'y' or 'n'${CEND}"
@@ -140,7 +139,6 @@ Uninstall_Docker_Compose() {
 
 Menu() {
     while :; do
-        echo
         echo 'What Are You Doing?'
         echo -e "\t${CMSG} 0${CEND}. Uninstall All"
         echo -e "\t${CMSG} 1${CEND}. Uninstall Docker"
@@ -148,7 +146,6 @@ Menu() {
         echo -e "\t${CMSG} q${CEND}. Exit"
 
         read -e -p "Please input the correct option: " Number
-        echo
         if [[ ! "${Number}" =~ ^[0-2,q]$ ]]; then
             echo "${CWARNING}input error! Please only input 0~2 and q${CEND}"
         else
@@ -176,6 +173,7 @@ Menu() {
                 [ "${uninstall_flag}" == 'y' ] && Uninstall_Docker_Compose || exit
                 ;;
             q)
+                echo
                 exit
                 ;;
             esac

@@ -70,7 +70,7 @@ while :; do
         docker_flag=y
         shift 1
         [ -e "/usr/local/bin/docker" ] && {
-            echo "${CWARNING}docker already installed! ${CEND}"
+            echo -e "${CWARNING}docker already installed! \n ${CEND}"
             unset docker_flag
         }
         ;;
@@ -78,7 +78,7 @@ while :; do
         docker_compose_flag=y
         shift 1
         [ -e "/usr/local/bin/docker-compose" ] && {
-            echo "${CWARNING}docker compose already installed! ${CEND}"
+            echo -e "${CWARNING}docker compose already installed! \e ${CEND}"
             unset docker_compose_flag
         }
         ;;
@@ -112,7 +112,6 @@ if [ -e "/etc/ssh/sshd_config" ]; then
     [ -z "$(grep ^Port /etc/ssh/sshd_config)" ] && now_ssh_port=22 || now_ssh_port=$(grep ^Port /etc/ssh/sshd_config | awk '{print $2}' | head -1)
 
     while :; do
-        echo
         [ ${ARG_NUM} == 0 ] && read -e -p "Please input SSH port(Default: ${now_ssh_port}): " ssh_port
         ssh_port=${ssh_port:-${now_ssh_port}}
 
@@ -207,6 +206,7 @@ if [ ${ARG_NUM} == 0 ]; then
                     echo -e "\t${CMSG} q${CEND}. Exit"
 
                     read -e -p "Please input the correct option: " docker_image_option
+                    echo -e ""
                     if [[ ! "${docker_image_option}" =~ ^[0-5,q]$ ]]; then
                         echo "${CWARNING}input error! Please only input 0~5 and q${CEND}"
                     else
@@ -300,8 +300,7 @@ if [ ! -e ~/.oneinstack ]; then
     esac
 fi
 
-echo
-echo "####################Congratulations########################"
+echo "############################Congratulations############################"
 [ "${docker_flag}" == 'y' ] && {
     echo -e "$(printf "%-32s" "docker install dir:")${CMSG}${docker_install_dir}${CEND}"
 }
@@ -310,7 +309,7 @@ echo "####################Congratulations########################"
     echo -e "$(printf "%-32s" "docker compose install dir:")${CMSG}${docker_compose_install_dir}${CEND}"
 }
 
-[ "${docker_image_option}" == 0 ] && {
+[[ "${docker_image_option}" =~ ^[0-5,q]$ ]] && {
     echo -e "$(printf "%-32s" "docker image install dir:")${CMSG}nginx, mysql, redis, java, java-mysql${CEND}"
 }
 
@@ -325,6 +324,8 @@ if [ ${ARG_NUM} == 0 ]; then
             break
         fi
     done
+else
+    echo -e ""
 fi
 
 [ "${reboot_flag}" == 'y' ] && reboot
