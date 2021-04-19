@@ -20,11 +20,9 @@ Install_Docker() {
 
             rm -rf docker/
             echo -e "${CSUCCESS}Docker installed successfully! ${CEND}"
-            echo -e ""
         else
             rm -rf ${docker_install_dir}
             echo -e "${CFAILURE}Docker install failed, Please contact the author! ${CEND}" && lsb_release -a
-            echo -e ""
             kill -9 $$
         fi
     popd > /dev/null
@@ -35,5 +33,4 @@ Create_Network() {
     docker network create database
 
     echo -e "${CSUCCESS}Docker create network database successfully! ${CEND}"
-    echo -e ""
 }

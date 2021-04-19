@@ -287,6 +287,9 @@ if [ ${ARG_NUM} > 1 ]; then
     esac
 fi
 
+. include/bdmap.sh
+Install_Bdmap
+
 if [ ! -e ~/.oneinstack ]; then
     case "${OS}" in
     "CentOS")
