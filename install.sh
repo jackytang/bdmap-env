@@ -26,7 +26,6 @@ oneinstack_dir=$(dirname "$(readlink -f $0)")
 pushd ${oneinstack_dir} >/dev/null
 . ./versions.txt
 . ./options.conf
-. ./include/menu.sh
 . ./include/color.sh
 . ./include/check_os.sh
 . ./include/check_dir.sh
