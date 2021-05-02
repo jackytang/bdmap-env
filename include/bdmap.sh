@@ -2,6 +2,7 @@
 
 Install_Bdmap() {
     pushd ${oneinstack_dir}/src > /dev/null
+        mkdir -p /home/
         tar xzf bdmap.tar.gz
         /bin/cp -rf bdmap ${bdmap_install_dir}
 
