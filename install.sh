@@ -27,6 +27,7 @@ pushd ${oneinstack_dir} >/dev/null
 . ./versions.txt
 . ./options.conf
 . ./include/color.sh
+. ./include/check_sw.sh
 . ./include/check_os.sh
 . ./include/check_dir.sh
 . ./include/download.sh
