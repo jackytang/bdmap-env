@@ -17,19 +17,19 @@ if [ -e "/usr/bin/yum" ]; then
         [ -e /etc/yum.repos.d/epel.repo ] && rm -f /etc/yum.repos.d/epel.repo
     fi
 
-    command -v lsb_release >/dev/null 2>&1 || {
-        [ -e "/etc/euleros-release" ] && yum -y install euleros-lsb || yum -y install redhat-lsb-core
-        clear
-    }
+    # command -v lsb_release >/dev/null 2>&1 || {
+    #     [ -e "/etc/euleros-release" ] && yum -y install euleros-lsb || yum -y install redhat-lsb-core
+    #     clear
+    # }
 fi
 
 if [ -e "/usr/bin/apt-get" ]; then
     PM=apt-get
-    command -v lsb_release >/dev/null 2>&1 || {
-        apt-get -y update
-        apt-get -y install lsb-release
-        clear
-    }
+    # command -v lsb_release >/dev/null 2>&1 || {
+    #     apt-get -y update
+    #     apt-get -y install lsb-release
+    #     clear
+    # }
 fi
 
 command -v lsb_release >/dev/null 2>&1 || {
