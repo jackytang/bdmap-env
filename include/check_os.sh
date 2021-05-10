@@ -8,6 +8,23 @@
 #       https://oneinstack.com
 #       https://github.com/oneinstack/oneinstack
 
+# Install centOS dependency
+if [ -e /etc/redhat-release ]; then
+    rpm -ivh ../tools/at-*.rpm
+    rpm -ivh ../tools/bc-*.rpm
+    rpm -ivh ../tools/avahi-*.rpm
+    rpm -ivh ../tools/cups-lib-*.rpm
+    rpm -ivh ../tools/cups-client-*.rpm
+    rpm -ivh ../tools/ed-*.rpm
+    rpm -ivh ../tools/m4-*.rpm
+    rpm -ivh ../tools/mailx-*.rpm
+    rpm -ivh ../tools/patch-*.rpm
+    rpm -ivh ../tools/redhat-lsb-submod-security-*.rpm
+    rpm -ivh ../tools/spax-*.rpm
+    rpm -ivh ../tools/time-*.rpm
+    rpm -ivh ../tools/redhat-lsb-core-*.rpm
+fi
+
 if [ -e "/usr/bin/yum" ]; then
     PM=yum
     if [ -e /etc/yum.repos.d/CentOS-Base.repo ] && grep -Eqi "release 6." /etc/redhat-release; then
@@ -84,10 +101,9 @@ if [ ${CentOS_ver} -lt 6 ] >/dev/null 2>&1 || [ ${Debian_ver} -lt 8 ] >/dev/null
     kill -9 $$
 fi
 
-command -v gcc >/dev/null 2>&1 || $PM -y install gcc
-gcc_ver=$(gcc -dumpversion | awk -F. '{print $1}')
-
-[ ${gcc_ver} -lt 5 ] >/dev/null 2>&1 && redis_ver=${redis_oldver}
+# command -v gcc >/dev/null 2>&1 || $PM -y install gcc
+# gcc_ver=$(gcc -dumpversion | awk -F. '{print $1}')
+# [ ${gcc_ver} -lt 5 ] >/dev/null 2>&1 && redis_ver=${redis_oldver}
 
 if uname -m | grep -Eqi "arm|aarch64"; then
     armplatform="y"
