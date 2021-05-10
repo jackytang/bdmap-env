@@ -109,31 +109,31 @@ while :; do
 done
 
 # Use default SSH port 22. If you use another SSH port on your server
-if [ -e "/etc/ssh/sshd_config" ]; then
-    [ -z "$(grep ^Port /etc/ssh/sshd_config)" ] && {
-        now_ssh_port=22 || now_ssh_port=$(grep ^Port /etc/ssh/sshd_config | awk '{print $2}' | head -1)
-    }
+# if [ -e "/etc/ssh/sshd_config" ]; then
+#     [ -z "$(grep ^Port /etc/ssh/sshd_config)" ] && {
+#         now_ssh_port=22 || now_ssh_port=$(grep ^Port /etc/ssh/sshd_config | awk '{print $2}' | head -1)
+#     }
 
-    while :; do
-        [ ${ARG_NUM} == 0 ] && {
-            read -e -p "Please input SSH port(Default: ${now_ssh_port}): " ssh_port
-        }
+#     while :; do
+#         [ ${ARG_NUM} == 0 ] && {
+#             read -e -p "Please input SSH port(Default: ${now_ssh_port}): " ssh_port
+#         }
 
-        ssh_port=${ssh_port:-${now_ssh_port}}
-        if [ ${ssh_port} -eq 22 -o ${ssh_port} -gt 1024 -a ${ssh_port} -lt 65535 ] >/dev/null 2>&1 >/dev/null 2>&1 >/dev/null 2>&1; then
-            break
-        else
-            echo -e "${CWARNING}input error! Input range: 22,1025~65534 \n${CEND}"
-            exit 1
-        fi
-    done
+#         ssh_port=${ssh_port:-${now_ssh_port}}
+#         if [ ${ssh_port} -eq 22 -o ${ssh_port} -gt 1024 -a ${ssh_port} -lt 65535 ] >/dev/null 2>&1 >/dev/null 2>&1 >/dev/null 2>&1; then
+#             break
+#         else
+#             echo -e "${CWARNING}input error! Input range: 22,1025~65534 \n${CEND}"
+#             exit 1
+#         fi
+#     done
 
-    if [ -z "$(grep ^Port /etc/ssh/sshd_config)" -a "${ssh_port}" != '22' ]; then
-        sed -i "s@^#Port.*@&Port ${ssh_port}@" /etc/ssh/sshd_config
-    elif [ -n "$(grep ^Port /etc/ssh/sshd_config)" ]; then
-        sed -i "s@^Port.*@Port ${ssh_port}@" /etc/ssh/sshd_config
-    fi
-fi
+#     if [ -z "$(grep ^Port /etc/ssh/sshd_config)" -a "${ssh_port}" != '22' ]; then
+#         sed -i "s@^#Port.*@&Port ${ssh_port}@" /etc/ssh/sshd_config
+#     elif [ -n "$(grep ^Port /etc/ssh/sshd_config)" ]; then
+#         sed -i "s@^Port.*@Port ${ssh_port}@" /etc/ssh/sshd_config
+#     fi
+# fi
 
 if [ ${ARG_NUM} == 0 ]; then
     # check docker
